@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node.js, TypeScript, and Vite
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Local databases and backups
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite3-journal
+*.bak
+*.backup
+
+# Logs and operating system files
+*.log
+.DS_Store
+Thumbs.db
