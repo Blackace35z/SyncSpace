@@ -18,7 +18,15 @@ SyncSpace is a full-stack workspace and task-planning app for organizing project
 
 ## Screenshots and demo
 
-Screenshots and a hosted demo are not currently included. Run the app locally using the instructions below to explore the interface.
+The screenshots below show the app running locally with a synthetic demo account, workspace, project, and tasks. They are not a hosted deployment; no public demo is currently available.
+
+### Dashboard
+
+![SyncSpace dashboard populated with synthetic demo data](docs/screenshots/syncspace-dashboard.png)
+
+### Project directory
+
+![SyncSpace project directory populated with a synthetic demo project](docs/screenshots/syncspace-projects.png)
 
 ## Technology
 
@@ -104,16 +112,25 @@ For contribution scope and pull request checks, see [CONTRIBUTING.md](./CONTRIBU
 ## Architecture
 
 ```text
-frontend/
-  src/                 React app, page components, and typed API client
-backend/
-  main.py              FastAPI routes, validation, and authorization
-  models.py            SQLModel persistence models
-  database.py          Database initialization and additive legacy migration
-  tests/               API/workspace and migration tests
+Browser
+  React app (frontend/src/App.tsx, frontend/src/pages/WorkspacePages.tsx)
+    ├── URL-backed navigation (History API)
+    └── Typed API client (frontend/src/services/api.ts)
+          └── JSON requests with session cookies and the selected workspace ID
+                ↓
+FastAPI (backend/main.py)
+  ├── Validates origins for state-changing requests
+  ├── Resolves the user from the session cookie
+  ├── Verifies membership in the selected workspace
+  └── Reads and writes workspace-scoped records
+        ↓
+SQLModel sessions → SQLAlchemy engine (backend/database.py)
+        ↓
+Database configured by DATABASE_URL
+  └── SQLite by default: backend/syncspace.db
 ```
 
-The browser sends same-site session cookies to the API. API routes resolve the current user and selected workspace, and project/task/notification queries are scoped to that workspace and, where appropriate, the authenticated recipient. The frontend uses the History API for page navigation.
+The API client sends requests with browser credentials and includes `X-Workspace-ID` when a workspace is selected. The backend validates the session cookie against a stored token digest and expiry, then checks that the user belongs to the requested workspace before serving protected workspace routes. Project and task reads and writes are scoped to that workspace; notification access is also scoped to its recipient. The database engine uses `DATABASE_URL`, with SQLite as the local default. The frontend uses the History API for page navigation.
 
 ## API documentation
 
